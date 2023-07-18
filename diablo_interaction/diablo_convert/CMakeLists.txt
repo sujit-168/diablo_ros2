@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(diablo_ctrl)
+project(diablo_convert)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -11,52 +11,35 @@ if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
 endif()
 
-
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic -Wno-psabi)
+  add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 # find dependencies
-find_package(rclcpp REQUIRED)
-find_package(diablo_body REQUIRED)
 find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
 find_package(motion_msgs REQUIRED)
-find_package(diablo_utils REQUIRED)
-
-include_directories(
-    include
-)
+find_package(geometry_msgs REQUIRED)
+# uncomment the following section in order to fill in
+# further dependencies manually.
+# find_package(<dependency> REQUIRED)
 
 set(dependencies
   rclcpp
-  diablo_body
   motion_msgs
-  diablo_utils
-  )
-
-set(executable_name diablo_ctrl_node)
-
-
-add_executable(${executable_name} 
-      src/diablo_ctrl.cpp
-        )
-
-ament_target_dependencies(${executable_name} ${dependencies})
-# ament_target_dependencies(${library_name} ${dependencies})
-
-
-install(DIRECTORY launch
-DESTINATION share/${PROJECT_NAME})
-
-install(TARGETS ${library_name}
-  DESTINATION lib)
-
-install(TARGETS ${executable_name}
-  DESTINATION lib/${PROJECT_NAME}
+  geometry_msgs
 )
 
-install(DIRECTORY include/
-  DESTINATION include/${PROJECT_NAME}
+set(executable_name msg_convert_node)
+
+add_executable(${executable_name}
+src/msg_convert.cpp
+)
+
+ament_target_dependencies(${executable_name} ${dependencies})
+
+install(TARGETS ${executable_name}
+DESTINATION lib/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)
@@ -70,8 +53,4 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-ament_export_include_directories(include)
-ament_export_libraries(${library_name})
-ament_export_dependencies(${dependencies})
 ament_package()
-

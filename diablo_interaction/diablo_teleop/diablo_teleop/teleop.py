@@ -146,7 +146,7 @@ def main(args=None):
             
             
         teleop_cmd.publish(ctrlMsgs)
-        time.sleep(0.04)
+        time.sleep(0.03)
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_setting)
     print('exit!')
     rclpy.shutdown() 
