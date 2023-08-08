@@ -73,7 +73,7 @@ def main(args=None):
     rclpy.init(args=args) 
     node = Node("diablo_teleop_node")  
 
-    teleop_cmd = node.create_publisher(MotionCtrl,"diablo/MotionCmd",2)
+    teleop_cmd = node.create_publisher(MotionCtrl,"diablo/MotionCmd",10)
 
     while True:
         if len(keyQueue) > 0:
@@ -103,11 +103,11 @@ def main(args=None):
                generMsgs(up = 0.0)
                 
             elif key == 'u':
-                generMsgs(pitch = 0.5)
+                generMsgs(pitch = 0.2)
             elif key == 'i':
                 generMsgs(pitch = 0.0)
             elif key == 'o':
-                generMsgs(pitch = -0.5)
+                generMsgs(pitch = -0.2)
 
             elif key == 'v':
                 generMsgs(mode_mark=True,height_ctrl_mode=True)
