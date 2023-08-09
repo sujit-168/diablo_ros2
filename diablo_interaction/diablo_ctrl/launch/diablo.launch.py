@@ -20,8 +20,7 @@ def generate_launch_description():
                 package = 'diablo_odom',
                 executable = 'odom_publish_node',
                 output = 'screen'
-
-            )
+            ),
 
         ]
     )
