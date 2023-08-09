@@ -7,8 +7,10 @@ class MsgConvert : public rclcpp::Node
 public:
   MsgConvert() : Node("msg_convert")
   {
+    
+    // 创建一个发布器来发布转换后的自定义消息
     publisher_ =
-        this->create_publisher<motion_msgs::msg::MotionCtrl>("diablo/MotionCmd", 10);  // 创建一个发布器来发布自定义消息
+        this->create_publisher<motion_msgs::msg::MotionCtrl>("diablo/MotionCmd", 10);  
     // 创建一个订阅器来订阅cmd_vel消息
     subscriber_ = this->create_subscription<geometry_msgs::msg::Twist>(
         "cmd_vel", 10, std::bind(&MsgConvert::msgconvert_callback, this, std::placeholders::_1));
