@@ -24,8 +24,9 @@ public:
     motor_subscriber_ = this->create_subscription<motion_msgs::msg::LegMotors>(
         "/diablo/sensor/Motors", 10, std::bind(&OdomPublisherNode::legmotors_callback, this, _1));
     odom_publisher_ = this->create_publisher<nav_msgs::msg::Odometry>("/diablo_odom", 10);
-    // timer_ = this->create_wall_timer(std::chrono::milliseconds(100),timer_callback);
+    
   }
+
 
 private:
   void legmotors_callback(const motion_msgs::msg::LegMotors::SharedPtr msg)
