@@ -10,11 +10,12 @@ from rclpy.node import Node
 from motion_msgs.msg import MotionCtrl
 
 print("Teleop start now!")
-print("Press '`' to exit!")
+print("Press '0' to exit!\n W A S D keys are used to control direction \n when use navigation,you can use emergency mode to break,\n'1' to activate,'2' to deactivate")
 
 keyQueue = []
 ctrlMsgs = MotionCtrl()
 old_setting = termios.tcgetattr(sys.stdin)
+
 
 def readchar():
     fd = sys.stdin.fileno()
@@ -39,12 +40,15 @@ t1.start()
 
 
 def generMsgs(forward=None,left=None,roll=None,up=None,
-                pitch=None,mode_mark=False,height_ctrl_mode = None,
+                pitch=None,mode_mark = None,height_ctrl_mode = None,
                 pitch_ctrl_mode = None,roll_ctrl_mode = None,stand_mode = None,
-                jump_mode = False,dance_mode = None):
+                jump_mode = False,dance_mode = None,emergency_mode = None):
     global ctrlMsgs
-    ctrlMsgs.mode_mark = mode_mark
+    if mode_mark is not None:
+        ctrlMsgs.mode_mark = mode_mark
     ctrlMsgs.mode.jump_mode = jump_mode
+    if emergency_mode is not None:
+        ctrlMsgs.emergency_mode = emergency_mode
 
     if dance_mode is not None:
         ctrlMsgs.mode.split_mode = dance_mode
@@ -71,9 +75,10 @@ def generMsgs(forward=None,left=None,roll=None,up=None,
 def main(args=None):
     global ctrlMsgs
     rclpy.init(args=args) 
-    node = Node("diablo_teleop_node")  
+    node = Node("diablo_teleop_node")
+      
 
-    teleop_cmd = node.create_publisher(MotionCtrl,"diablo/MotionCmd",10)
+    teleop_cmd = node.create_publisher(MotionCtrl,"key_control",10)
 
     while True:
         if len(keyQueue) > 0:
@@ -103,50 +108,67 @@ def main(args=None):
                generMsgs(up = 0.0)
                 
             elif key == 'u':
-                generMsgs(pitch = 0.2)
+                if ctrlMsgs.value.pitch is None:  
+                    ctrlMsgs.value.pitch = 0.0     
+                else:
+                    ctrlMsgs.value.pitch += 0.1 
             elif key == 'i':
                 generMsgs(pitch = 0.0)
             elif key == 'o':
-                generMsgs(pitch = -0.2)
-
+                if ctrlMsgs.value.pitch is None:
+                    ctrlMsgs.value.pitch = 0.0
+                else:
+                    ctrlMsgs.value.pitch -= 0.1
+            elif key == '1' :
+                generMsgs(emergency_mode = True)
+                print('Emergnecy mode activate\n')
+            elif key == '2' :
+                generMsgs(emergency_mode = False)
+                print('Emergency mode shutdown\n')
+            elif key == '3' :
+                generMsgs(mode_mark = True)
+                print('mode_mark is True')
+            elif key == '4' :
+                generMsgs(mode_mark = False)
+                print(f'mode_mark is False')
             elif key == 'v':
-                generMsgs(mode_mark=True,height_ctrl_mode=True)
+                generMsgs(height_ctrl_mode=True)
             elif key == 'b':
-                generMsgs(mode_mark=True,height_ctrl_mode=False)
+                generMsgs(height_ctrl_mode=False)
             elif key == 'n':
-                generMsgs(mode_mark=True,pitch_ctrl_mode=True)
+                generMsgs(pitch_ctrl_mode=True)
             elif key == 'm':
-                generMsgs(mode_mark=True,pitch_ctrl_mode=False)
+                generMsgs(pitch_ctrl_mode=False)
 
             elif key == 'z':
-                generMsgs(mode_mark=True,stand_mode=True)
-                teleop_cmd.publish(ctrlMsgs)
-                generMsgs(up=1.0)
-                teleop_cmd.publish(ctrlMsgs)
+                generMsgs(stand_mode=True)
+                # teleop_cmd.publish(ctrlMsgs)
+                # generMsgs(up=1.0)
+                # teleop_cmd.publish(ctrlMsgs)
+                # time.sleep(0.1)
             elif key == 'x':
-                generMsgs(mode_mark=True,stand_mode=False)
-                teleop_cmd.publish(ctrlMsgs)
+                generMsgs(stand_mode=False)
+                # teleop_cmd.publish(ctrlMsgs)
             elif key == 'c':
-                generMsgs(mode_mark=True,jump_mode=True)
-                teleop_cmd.publish(ctrlMsgs)
+                generMsgs(jump_mode=True)
+                # teleop_cmd.publish(ctrlMsgs)
             elif key == 'f':
-                generMsgs(mode_mark=True,dance_mode=True)
-                teleop_cmd.publish(ctrlMsgs)
+                generMsgs(dance_mode=True)
+                # teleop_cmd.publish(ctrlMsgs)
             elif key == 'g':
-                generMsgs(mode_mark=True,dance_mode=False)
-                teleop_cmd.publish(ctrlMsgs)
-            elif key == '`':
+                generMsgs(dance_mode=False)
+                # teleop_cmd.publish(ctrlMsgs)
+            elif key == '0':
+                print("Exiting loop")
                 break
         else:
             # print(" run here")
-            ctrlMsgs.mode_mark = False
-            ctrlMsgs.mode.split_mode = False
+            # ctrlMsgs.mode_mark = False
+            # ctrlMsgs.mode.split_mode = False
             ctrlMsgs.value.forward = 0.0
             ctrlMsgs.value.left = 0.0
-            
-            
         teleop_cmd.publish(ctrlMsgs)
-        time.sleep(0.03)
+        time.sleep(0.04)
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_setting)
     print('exit!')
     rclpy.shutdown() 
