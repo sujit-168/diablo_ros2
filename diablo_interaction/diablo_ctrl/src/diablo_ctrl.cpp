@@ -11,7 +11,7 @@ void diabloCtrlNode::heart_beat_loop(void){
         {
             if(!pMovementCtrl->in_control())
             {
-                RCLCPP_INFO(this->get_logger(), "get control.");
+                //RCLCPP_INFO(this->get_logger(), "get control.");
                 pMovementCtrl->obtain_control();
                 continue;
             }
@@ -36,7 +36,7 @@ void diabloCtrlNode::heart_beat_loop(void){
                 pMovementCtrl->ctrl_mode_data.roll_ctrl_mode = ctrl_msg_.mode.roll_ctrl_mode;
                 pMovementCtrl->SendMovementModeCtrlCmd();
             }
-            usleep(200000);
+            usleep(160000);
         }
     }
 }
@@ -107,10 +107,8 @@ int main(int argc, char **argv)
     auto node = std::make_shared<diabloCtrlNode>("diablo_ctrl_node");
 
     DIABLO::OSDK::HAL_Pi Hal;
-    if(Hal.init("/dev/ttyUSB_diablo")){
-        return -1;
-    } 
-    std::cout << "HAL initialization successful!" << std::endl;
+    if(Hal.init("/dev/ttyUSB_diablo")) return -1;
+    
 
     DIABLO::OSDK::Vehicle vehicle(&Hal);                     
     if(vehicle.init()) return -1;
