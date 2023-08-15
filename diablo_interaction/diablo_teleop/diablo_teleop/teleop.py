@@ -9,8 +9,29 @@ import threading
 from rclpy.node import Node
 from motion_msgs.msg import MotionCtrl
 
-print("Teleop start now!")
-print("Press '0' to exit!\n W A S D keys are used to control direction \n when use navigation,you can use emergency mode to break,\n'1' to activate,'2' to deactivate")
+print("键盘控制启动")
+print("""
+!!! 在任何情况下你可以按下数字键 '1' 来激活紧急模式，该模式下只允许接收键盘控制而会屏蔽导航消息，在确保机器人安全后通过数字 '2' 键退出
+控制模式操作如下：
+- 使用 w a s d 控制机器人的前进后退与旋转
+- 使用数字3键激活mode_mark模式(True),当且仅当该模式为True时,以下的按键才生效,使用数字4键关闭(False)。
+  - z键:触发stand_mode让机器人站立,注意:在ROS下机器人初次站立会有一个起跳的动作,请保证周围留有足够空间
+  - x键:卧倒
+  - c键:激活跳跃模式
+  - f键:激活跳舞模式
+  - g键:关闭跳舞模式
+- 当激活站立模式后,使用4键关闭mode_mark模式你可以调整机器人的姿态。
+  - u键:调整低头
+  - o键:调整抬头
+  - i键:恢复原位
+  - j键:站立高度最高值 1.0
+  - k键:站立高度中间值 0.5
+  - l键:站立高度最低值 0.0
+  - q键:使机器人左倾 0.1
+  - e键:使机器人右倾 0.1 如需调整具体数值请在源码中修改
+!!!使用数字键 '0' 退出!!!
+""")
+
 
 keyQueue = []
 ctrlMsgs = MotionCtrl()
@@ -97,9 +118,6 @@ def main(args=None):
                 generMsgs(roll=-0.1)
             elif key == 'r':
                 generMsgs(roll=0.0)
-
-            elif key == 'h':
-                generMsgs(up = -0.5)
             elif key == 'j':
                 generMsgs(up = 1.0)
             elif key == 'k':
@@ -121,16 +139,16 @@ def main(args=None):
                     ctrlMsgs.value.pitch -= 0.1
             elif key == '1' :
                 generMsgs(emergency_mode = True)
-                print('Emergnecy mode activate\n')
+                print("\remergency mode is True\n",end='', flush=True)
             elif key == '2' :
                 generMsgs(emergency_mode = False)
-                print('Emergency mode shutdown\n')
+                print("\remergency mode is False\n",end='',flush=True)
             elif key == '3' :
                 generMsgs(mode_mark = True)
-                print('mode_mark is True')
+                print("\rmode mark is True\n",end='',flush=True)
             elif key == '4' :
                 generMsgs(mode_mark = False)
-                print(f'mode_mark is False')
+                print("\rmode mark is False\n",end='',flush=True)
             elif key == 'v':
                 generMsgs(height_ctrl_mode=True)
             elif key == 'b':
@@ -142,29 +160,18 @@ def main(args=None):
 
             elif key == 'z':
                 generMsgs(stand_mode=True)
-                # teleop_cmd.publish(ctrlMsgs)
-                # generMsgs(up=1.0)
-                # teleop_cmd.publish(ctrlMsgs)
-                # time.sleep(0.1)
             elif key == 'x':
                 generMsgs(stand_mode=False)
-                # teleop_cmd.publish(ctrlMsgs)
             elif key == 'c':
                 generMsgs(jump_mode=True)
-                # teleop_cmd.publish(ctrlMsgs)
             elif key == 'f':
                 generMsgs(dance_mode=True)
-                # teleop_cmd.publish(ctrlMsgs)
             elif key == 'g':
                 generMsgs(dance_mode=False)
-                # teleop_cmd.publish(ctrlMsgs)
             elif key == '0':
                 print("Exiting loop")
                 break
         else:
-            # print(" run here")
-            # ctrlMsgs.mode_mark = False
-            # ctrlMsgs.mode.split_mode = False
             ctrlMsgs.value.forward = 0.0
             ctrlMsgs.value.left = 0.0
         teleop_cmd.publish(ctrlMsgs)
