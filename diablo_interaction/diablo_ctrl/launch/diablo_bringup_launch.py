@@ -8,18 +8,35 @@ from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
     livox_dir = os.path.join(get_package_share_directory('livox_ros_driver2'),'launch_ROS2')
+    realsense2_cam_dir = os.path.join(get_package_share_directory('realsense2_camera'),'launch')
     
     return LaunchDescription(
         [
         IncludeLaunchDescription(
         	PythonLaunchDescriptionSource([livox_dir,'/msg_MID360_launch.py'])
         	),
+        IncludeLaunchDescription(
+        	PythonLaunchDescriptionSource([realsense2_cam_dir,'/rs_launch.py'])
+        	),
             Node(
             package='tf2_ros',
             executable='static_transform_publisher',
             name='static_transform_publisher',
-            arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'livox_frame']
-        ),
+            arguments=['0', '0', '0.5', '0', '0', '0', '1', 'base_link', 'livox_frame']
+            ),
+            Node(
+                package='tf2_ros',
+                executable='static_transform_publisher',
+                name='static_transform_publisher',
+                arguments=['0', '0', '0.25', '0', '0', '0', '1', 'base_link', 'camera_link']
+            ),
+            Node(
+                package='tf2_ros',
+                executable='static_transform_publisher',
+                name='static_transform_publisher',
+                arguments=['0', '0', '0', '0', '0', '0', '1', 'base_footprint', 'base_link']
+            ),
+        
             Node(
             package='pointcloud_to_laserscan', executable='pointcloud_to_laserscan_node',
             remappings=[('cloud_in', '/livox/lidar'),
@@ -54,7 +71,7 @@ def generate_launch_description():
                 package = 'diablo_ctrl',
                 executable = 'diablo_ctrl_node',
                 output = 'screen'
-            )
+            ),
 
         ]
     )
