@@ -34,9 +34,11 @@ add_library(${library_name} SHARED
   src/diablo_tools/osdk_crc.cpp
   src/diablo_tools/osdk_hal.cpp
   src/diablo_tools/osdk_log.cpp
+  src/diablo_tools/osdk_pid.cpp
   src/diablo_tools/osdk_movement.cpp
   src/diablo_tools/osdk_telemetry.cpp
   src/diablo_tools/osdk_vehicle.cpp
+  src/diablo_tools/osdk_virtual_rc.cpp
 )
 
 ament_target_dependencies(${library_name}
@@ -65,4 +67,8 @@ ament_export_include_directories(include)
 ament_export_libraries(${library_name})
 ament_export_dependencies(${dependencies})
 
+<<<<<<< HEAD
 ament_package()
+=======
+ament_package()
+>>>>>>> dev

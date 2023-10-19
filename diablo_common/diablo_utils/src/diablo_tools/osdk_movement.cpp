@@ -89,6 +89,7 @@ void Movement_Ctrl::CtrlStatusMonitorHandle(const uint8_t ctrl_mode)
     {
         if(dropCtrlCnt > 10)
         {
+            // printf("drop out is %d and ctrl mode is %d",(1<<(vehicle->telemetry->id*2)),ctrl_mode);
             if(ctrl_status == CTRL_OBTAINED)
                 std::cout<<"Motion control authority released by vehicle"<<std::endl;
             this->SerialDisconnectHandle();
@@ -180,6 +181,11 @@ uint8_t Movement_Ctrl::SendMovementModeCtrlCmd()
 
         if(result) return result;
     }
+<<<<<<< HEAD
+=======
+
+    // printf("==MOVEMENT CONTROL MODE SET==\n");
+>>>>>>> dev
     ctrl_mode_cmd = false;
     return 0;
 }

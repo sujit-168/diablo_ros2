@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "teleop_node = diablo_teleop.teleop:main"
+            "teleop_node = diablo_teleop.teleop:main",
+            "status_lock_node = diablo_teleop.statuslock:main"
         ],
     },
 )
