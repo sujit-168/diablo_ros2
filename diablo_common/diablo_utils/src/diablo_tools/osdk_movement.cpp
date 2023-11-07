@@ -181,11 +181,8 @@ uint8_t Movement_Ctrl::SendMovementModeCtrlCmd()
 
         if(result) return result;
     }
-<<<<<<< HEAD
-=======
 
     // printf("==MOVEMENT CONTROL MODE SET==\n");
->>>>>>> dev
     ctrl_mode_cmd = false;
     return 0;
 }

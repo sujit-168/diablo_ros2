@@ -67,8 +67,4 @@ ament_export_include_directories(include)
 ament_export_libraries(${library_name})
 ament_export_dependencies(${dependencies})
 
-<<<<<<< HEAD
 ament_package()
-=======
-ament_package()
->>>>>>> dev

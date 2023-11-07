@@ -23,9 +23,9 @@ public:
     // subscrible left and right vel of wheel, calc odom diff
     motor_subscriber_ = this->create_subscription<motion_msgs::msg::LegMotors>(
         "/diablo/sensor/Motors", 10, std::bind(&OdomPublisherNode::legMotorsCallback, this, std::placeholders::_1));
-
+    
     // create odom and tf publisher
-    odom_publisher_ = this->create_publisher<nav_msgs::msg::Odometry>("odom", 10);
+    odom_publisher_ = this->create_publisher<nav_msgs::msg::Odometry>("/diablo_odom", 10);
     tf_publisher_ = this->create_publisher<tf2_msgs::msg::TFMessage>("/tf", 10);
 
     // Initialize the odometry message

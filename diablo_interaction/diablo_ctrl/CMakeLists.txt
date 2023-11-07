@@ -24,7 +24,7 @@ find_package(motion_msgs REQUIRED)
 find_package(diablo_utils REQUIRED)
 
 include_directories(
-    includze
+    include
 )
 
 set(dependencies
@@ -45,7 +45,7 @@ ament_target_dependencies(${executable_name} ${dependencies})
 # ament_target_dependencies(${library_name} ${dependencies})
 
 
-install(DIRECTORY launch
+install(DIRECTORY launch config
 DESTINATION share/${PROJECT_NAME})
 
 install(TARGETS ${library_name}
