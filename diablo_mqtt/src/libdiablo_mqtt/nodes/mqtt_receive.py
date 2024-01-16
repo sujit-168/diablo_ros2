@@ -3,6 +3,7 @@ from rclpy.node import Node
 from std_msgs.msg import String
 import paho.mqtt.client as mqtt
 import time
+import subprocess
 
 class RosToMqttPublisher(Node):
 
@@ -29,6 +30,9 @@ class RosToMqttPublisher(Node):
         self.mqtt_client.on_message = self.on_message
         self.mqtt_client.on_disconnect = self.on_disconnect  # 添加断线重连回调
 
+        # 延迟连接尝试
+        time.sleep(15)
+
         # 连接到 MQTT Broker
         self.mqtt_client.connect(self.mqtt_broker, 1883, 60)
         # self.mqtt_client.connect_async(self.mqtt_broker, 1883, 60)
@@ -40,6 +44,14 @@ class RosToMqttPublisher(Node):
         self.mqtt_client.loop_start()
 
     def on_connect(self, client, userdata, flags, rc):
+        # 检查网络连接状态
+        if not self.is_network_connected():
+            # 延迟连接尝试
+            time.sleep(5)
+            self.mqtt_client.connect(self.mqtt_broker, 1883, 60)
+            return
+        
+        # 网络连接正常，继续执行
         self.get_logger().info("Connected with result code " + str(rc))
         # 订阅来自 MQTT 的消息主题
         client.subscribe(self.mqtt_topic_to_subscribe)
@@ -60,6 +72,17 @@ class RosToMqttPublisher(Node):
                 except:
                     self.get_logger().warning("Failed to reconnect. Retrying in 5 seconds...")
                     time.sleep(5)
+
+    def is_network_connected(self):
+        try:
+            # 使用 ping 命令检查网络连接
+            subprocess.run(["ping", "-c", "1", self.mqtt_broker],
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL)
+            return True
+        except subprocess.CalledProcessError:
+            return False
+
 
     def on_message(self, client, userdata, msg):
         message = msg.payload.decode()
