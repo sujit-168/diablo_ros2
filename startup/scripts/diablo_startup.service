@@ -1,0 +1,13 @@
+[Unit]
+Description=powerOn startup ros
+ 
+[Service]
+Type=simple
+Restart=always
+RestartSec=30
+ExecStart=/usr/sbin/diablo_start 
+ExecStop=/usr/sbin/diablo_stop
+ExecRestart=/usr/sbin/diablo_restart
+ 
+[Install]
+WantedBy=multi-user.target

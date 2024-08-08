@@ -12,6 +12,9 @@ using namespace DIABLO::OSDK;
 void Telemetry::timeLog()
 {
     if(log_start) return;  //will only record timestamp once per log
+
+    // cout<<"\n==Timestamp:"<<this->timestamp<<", Delay:"<<
+    //     (vehicle->hal->getTimeStamp() - this->timestamp)*1e3<<"ms==\n";
     printf("\n==Timestamp:%d\n",this->timestamp);
     log_start = true;
 }

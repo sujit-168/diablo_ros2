@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Author: sujit-168 su2054552689@gmail.com
+# Date: 2023-11-14 19:11:36
+# Description: diablo stop
+# Copyright (c) 2023 by Tianbot. All Rights Reserved. 
+
+# ref: https://qiita.com/porizou1/items/daab0fd5f9cfe48b7978
+ps aux | grep ros | grep -v grep | awk '{ print "kill -9", $2 }' | sh
+
+exit 0

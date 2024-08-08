@@ -3,13 +3,17 @@
 #include "diablo_utils/diablo_tools/osdk_virtual_rc.hpp"
 
 using namespace DIABLO::OSDK;
-
+using namespace std;
 uint8_t Virtual_RC::obtain_control(uint16_t timeout_ms)
 {
+   
+    std::cout<<"this"<<std::endl; 
+    std::cout.flush();
     if(this->in_control()) return 5;
     if(vehicle->telemetry->status.ctrl_mode & ((1<<(vehicle->telemetry->id*2)) | (1<<(4+vehicle->telemetry->id*2))))
-        exit(0);        // control is taken by Movement Ctrl
-    
+        {
+            exit(0);        // control is taken by Movement Ctrl
+        }
     Header header;
     header.data.LEN = sizeof(OSDK_Uart_Header_t) + 
         sizeof(OSDK_Virtual_RC_Request_t) + OSDK_MISC_SIZE;
@@ -22,10 +26,11 @@ uint8_t Virtual_RC::obtain_control(uint16_t timeout_ms)
     req.request     = 1;
     req.timeout_act = 0;
     req.timeout_ms  = timeout_ms;
-
+    std::cout<<"ack"<<std::endl; 
     uint16_t ack = -1;
     while(ack != 0x0002)
     {
+        std::cout<<"in"<<std::endl; 
         uint8_t result = vehicle->hal->serialSend_ack(header.data, ack,
         OSDK_VIRTUAL_RC_SET, OSDK_VIRTUAL_RC_AUTHORIZE_ID, 
         &req, sizeof(OSDK_Virtual_RC_Request_t));
@@ -76,6 +81,7 @@ uint8_t Virtual_RC::release_control()
 
 uint8_t Virtual_RC::SendVirtualRCCmd()
 {
+    //printf("send VRC Cmd\n");
     if(this->ctrl_status == CTRL_IDLE)
     {
         if(idle_buffer)
