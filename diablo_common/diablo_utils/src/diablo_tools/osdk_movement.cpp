@@ -7,10 +7,12 @@ using namespace DIABLO::OSDK;
 
 uint8_t Movement_Ctrl::obtain_control(uint16_t timeout_ms)
 {
+    // printf("obtain_control run\n");
     if(this->in_control()) return 5;
     if(vehicle->telemetry->status.ctrl_mode & ((1<<(1+vehicle->telemetry->id*2)) | (1<<(5+vehicle->telemetry->id*2))))
         exit(0);        // control is taken by virtual RC
 
+    // printf("Hear start\n");
     Header header;
     header.data.LEN = sizeof(OSDK_Uart_Header_t) + 
         sizeof(OSDK_Movement_Ctrl_Request_t) + OSDK_MISC_SIZE;
@@ -18,34 +20,39 @@ uint8_t Movement_Ctrl::obtain_control(uint16_t timeout_ms)
     header.data.ACK     = 1;
     header.data.SEQ     = vehicle->hal->serial_getSeq();
     header.append_crc();
-
+    //  printf("Hear end\n");
     OSDK_Movement_Ctrl_Request_t req;
     req.request     = 1;
     req.timeout_act = 0;
     req.timeout_ms  = timeout_ms;
 
     uint16_t ack = -1;
+    // printf("while start\n");
+   
     while(ack != 0x0002)
-    {
+    {    
+        // printf("Current ack value1: 0x%04X\n", ack);
         // printf("Wait ack to get AUTHORIZE\n");
         uint8_t result = vehicle->hal->serialSend_ack(header.data, ack, 
             OSDK_CONTROL_SET, OSDK_CTRL_AUTHORIZE_ID,
             &req, sizeof(OSDK_Movement_Ctrl_Request_t));
-        
+        // printf("Current ack value2: 0x%04X\n", ack);
         if(result) return result;
         if(ack == 0x0000)
         {
-            // printf("ERROR: SDK control disable on manual movement_ctrl, check your robot.\n");
+            printf("ERROR: SDK control disable on manual movement_ctrl, check your robot.\n");
             return 3;
         }
         if(ack == 0x000A)
         {
-            // printf("ERROR: Cannot switch to SDK control, check your robot status.\n");
+            printf("ERROR: Cannot switch to SDK control, check your robot status.\n");
             return 3;
         }
+        // printf("Current ack value3: 0x%04X\n", ack);
+     
         usleep(5000);
     }
-    
+    // printf("while end\n");
     this->ctrl_status = CTRL_OBTAINED;
     idle_buffer = true;
     printf("SDK Handle Movement control\n");
@@ -282,6 +289,7 @@ uint8_t Movement_Ctrl::SendJumpCmd(uint8_t Jump_mark)
 
         if(ack == 0)
         {
+            printf("==TRANSFORM UP FAIL==\n");
             return 0xFF;
         }
         usleep(10000);

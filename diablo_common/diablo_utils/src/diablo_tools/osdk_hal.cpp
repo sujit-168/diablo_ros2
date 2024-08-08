@@ -42,13 +42,16 @@ uint8_t HAL::serialSend_ack(const OSDK_Uart_Header_t& header, uint16_t& ack,
     // should receive reporting ack value within 100ms, once the ack packet has been sent
     static const chrono::duration<int, milli> timeout(100);
     {
+        // printf("seria Current ack value: 0x%04X\n", ack);
         unique_lock<mutex> lock(serial_rx_mtx);
         if(!serial_rx_ack_cond.wait_for(lock, timeout, 
             std::bind(&DIABLO::OSDK::HAL::verifyRXType, this, cmd_set, cmd_id))) 
         {
             return 2;
         }
+        // printf("seria Current ack value2: 0x%04X\n", ack);
         ack = this->getACK();
+        // printf("seria Current ack value3: 0x%04X\n", ack);
     }
 
 
@@ -121,11 +124,17 @@ uint8_t HAL_Pi::serialSend(const OSDK_Uart_Header_t& header,
     serial_tx_idle = false;
     serial_tx_cond.notify_all();
 
+    std::cout << "Sent data in hexadecimal format: ";
+    for (uint8_t i = 0; i < size; i++) {
+        std::cout << std::hex << static_cast<int>(serial_txbuf[i]) << " ";
+    }
+    std::cout << std::endl;
+    
     for(uint8_t i = 0; i < size; i++) 
         mySerial.WriteChar(serial_txbuf[i]);
-    
+        
     return 0;
-}
+    }
 
 void HAL_Pi::RXMonitorProcess(void)
 {
@@ -199,13 +208,14 @@ void HAL_Pi::RXMonitorProcess(void)
             header.data.SOF = 0xFF;     // set SOF to 0xFF, meaning processed packet
             lock.unlock();
             continue;
-        }
+        } 
         
         if(header.data.ACK)    serial_rx_ack_cond.notify_all();
         else                   serial_rx_data_cond.notify_all();
 
         header.data.SOF = 0xFF;     // set SOF to 0xFF, meaning processed packet
         lock.unlock();
+    
     }
 }
 
