@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Author: sujit-168 su2054552689@gmail.com
+# Date: 2023-11-14 19:11:36
+# Description: diablo restart
+# Copyright (c) 2023 by Tianbot. All Rights Reserved. 
+
+. /usr/sbin/diablo_stop
+
+sleep 3
+
+. /usr/sbin/diablo_start
+
+exit 0 
