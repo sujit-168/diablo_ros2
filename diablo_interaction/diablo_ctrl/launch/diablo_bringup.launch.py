@@ -10,8 +10,11 @@ from ament_index_python.packages import get_package_share_directory
 def generate_launch_description():
     livox_dir = os.path.join(get_package_share_directory('livox_ros_driver2'),'launch_ROS2')
     realsense2_cam_dir = os.path.join(get_package_share_directory('realsense2_camera'),'launch')
+    nmea_dir = os.path.join(get_package_share_directory('nmea_navsat_driver'), 'launch')
     robot_ekf_dir = os.path.join(get_package_share_directory('robot_localization'))
     ekf_param_dir = os.path.join(get_package_share_directory('diablo_ctrl'),'/config')
+    mqtt_dir = os.path.join(get_package_share_directory('diablo_mqtt'),'launch')
+    diablo_ctrl_dir = os.path.join(get_package_share_directory('diablo_ctrl'),'launch')
 
     ekf_config_dir = LaunchConfiguration(
         'params_file',
@@ -22,10 +25,23 @@ def generate_launch_description():
         [
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([livox_dir,'/msg_MID360_launch.py'])
-                ),
+            ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([realsense2_cam_dir,'/rs_launch.py'])
-                ),
+            ),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([nmea_dir,'/nmea_serial_driver.launch.py'])
+            ),
+                
+            # mqtt
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([mqtt_dir,'/diablo_mqtt.launch.py'])
+            ),
+
+            # diablo_ctrl
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([diablo_ctrl_dir,'/diablo_ctrl.launch.py'])
+            ),
 
             # robot_localization
             IncludeLaunchDescription(
@@ -53,10 +69,10 @@ def generate_launch_description():
 
             # Transform base_link to lidar_link 
             Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            name='static_transform_publisher',
-            arguments=['0', '0', '0.5', '0', '0', '0', '1', 'base_link', 'livox_frame']
+                package='tf2_ros',
+                executable='static_transform_publisher',
+                name='static_transform_publisher',
+                arguments=['0', '0', '0.5', '0', '0', '0', '1', 'base_link', 'livox_frame']
             ),
 
             # Transform base_link to camera_link 
@@ -98,8 +114,8 @@ def generate_launch_description():
                 output = 'screen'
             ),
             Node(
-                package = 'diablo_ctrl',
-                executable = 'diablo_ctrl_node',
+                package = 'diablo_teleop',
+                executable = 'teleop_stand_node',
                 output = 'screen'
             ),
         ]

@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             "teleop_node = diablo_teleop.teleop:main",
+            "teleop_stand_node = diablo_teleop.teleop_stand:main",
             "status_lock_node = diablo_teleop.statuslock:main"
         ],
     },

@@ -11,7 +11,6 @@ void diabloCtrlNode::heart_beat_loop(void){
         {
             if(!pMovementCtrl->in_control())
             {
-                //RCLCPP_INFO(this->get_logger(), "get control.");
                 pMovementCtrl->obtain_control();
                 continue;
             }
@@ -36,7 +35,7 @@ void diabloCtrlNode::heart_beat_loop(void){
                 pMovementCtrl->ctrl_mode_data.roll_ctrl_mode = ctrl_msg_.mode.roll_ctrl_mode;
                 pMovementCtrl->SendMovementModeCtrlCmd();
             }
-            usleep(160000);
+            usleep(180000);
         }
     }
 }
@@ -49,7 +48,6 @@ void diabloCtrlNode::run_(void){
 void diabloCtrlNode::Motion_callback(const motion_msgs::msg::MotionCtrl::SharedPtr msg)
 {
     onSend = false;
-    // RCLCPP_INFO(this->get_logger(), "control mode %d",!pMovementCtrl->in_control());
     if(!pMovementCtrl->in_control())
     {
         pMovementCtrl->obtain_control();
@@ -75,14 +73,10 @@ void diabloCtrlNode::Motion_callback(const motion_msgs::msg::MotionCtrl::SharedP
             pMovementCtrl->SendTransformDownCmd();
         }
         
-        // RCLCPP_INFO(this->get_logger(), "try to jump.");
         if(pTelemetry->status.robot_mode == 3){
             pMovementCtrl->SendJumpCmd(msg->mode.jump_mode);
         }
         pMovementCtrl->SendDanceCmd(msg->mode.split_mode);
-        // else{
-        //     pMovementCtrl->SendJumpCmd(0);
-        // }
         pMovementCtrl->ctrl_mode_data.height_ctrl_mode = msg->mode.height_ctrl_mode;
         pMovementCtrl->ctrl_mode_data.pitch_ctrl_mode = msg->mode.pitch_ctrl_mode;
         pMovementCtrl->ctrl_mode_data.roll_ctrl_mode = msg->mode.roll_ctrl_mode;

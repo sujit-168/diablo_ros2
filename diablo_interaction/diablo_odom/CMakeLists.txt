@@ -32,7 +32,8 @@ find_package(tf2_geometry_msgs REQUIRED)
 set(executable_name odom_publish_node)
 
 add_executable(${executable_name}
-src/odom_publish.cpp
+# src/odom_publish.cpp
+src/odom_publish_no_tf.cpp
 )
 
 ament_target_dependencies(${executable_name}
