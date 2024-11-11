@@ -11,15 +11,14 @@ def generate_launch_description():
     )
 
     teleop_stand_node = launch_ros.actions.Node(
-        name='diablo_stand_ctrl_node',
-        package='diablo_teleop',
-        executable='teleop_stand_node',
+        name='diablo_stand_node',
+        package='diablo_bringup',
+        executable='teleop_stand.py',
         respawn=True,
         respawn_delay=10.0
     )
     
     return launch.LaunchDescription([diablo_ctrl_node, teleop_stand_node])
-    # return launch.LaunchDescription([diablo_ctrl_node])
 
 if __name__ == '__main__':
     launch.launch(generate_launch_description())

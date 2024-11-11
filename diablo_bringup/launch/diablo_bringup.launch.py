@@ -12,9 +12,10 @@ def generate_launch_description():
     realsense2_cam_dir = os.path.join(get_package_share_directory('realsense2_camera'),'launch')
     nmea_dir = os.path.join(get_package_share_directory('nmea_navsat_driver'), 'launch')
     robot_ekf_dir = os.path.join(get_package_share_directory('robot_localization'))
-    ekf_param_dir = os.path.join(get_package_share_directory('diablo_ctrl'),'/config')
+    ekf_param_dir = os.path.join(get_package_share_directory('diablo_bringup'),'/config')
     mqtt_dir = os.path.join(get_package_share_directory('diablo_mqtt'),'launch')
-    diablo_ctrl_dir = os.path.join(get_package_share_directory('diablo_ctrl'),'launch')
+    diablo_ctrl_dir = os.path.join(get_package_share_directory('diablo_bringup'),'launch')
+    diablo_tf_dir = os.path.join(get_package_share_directory('diablo_description'),'launch')
 
     ekf_config_dir = LaunchConfiguration(
         'params_file',
@@ -43,6 +44,11 @@ def generate_launch_description():
                 PythonLaunchDescriptionSource([diablo_ctrl_dir,'/diablo_ctrl.launch.py'])
             ),
 
+            # diablo_tf
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([diablo_tf_dir,'/diablo_tf.launch.py'])
+            ),
+
             # robot_localization
             IncludeLaunchDescription(
             	PythonLaunchDescriptionSource([robot_ekf_dir,'/launch/ekf.launch.py']),
@@ -50,43 +56,14 @@ def generate_launch_description():
                     'params_file':ekf_config_dir
                 }.items(),
             ),
-            
-            # static broadcaster publisher from base_footprint to base_link
-            Node(
-                package = 'tf2_ros',
-                executable = 'static_transform_publisher',
-                name='static_transform_publisher',
-                arguments = ['0','0','0','0','0','0','base_footprint','base_link']
-            ),
-
-            # Transform base_link to diablo_robot 
-            Node(
-                package='tf2_ros',
-                executable='static_transform_publisher',
-                name='static_transform_publisher',
-                arguments=['0', '0', '0.3', '0', '0', '0', '1', 'base_link', 'diablo_robot']
-            ),
-
-            # Transform base_link to lidar_link 
-            Node(
-                package='tf2_ros',
-                executable='static_transform_publisher',
-                name='static_transform_publisher',
-                arguments=['0', '0', '0.5', '0', '0', '0', '1', 'base_link', 'livox_frame']
-            ),
-
-            # Transform base_link to camera_link 
-            Node(
-                package='tf2_ros',
-                executable='static_transform_publisher',
-                name='static_transform_publisher',
-                arguments=['0', '0', '0.25', '0', '0', '0', '1', 'base_link', 'camera_link']
-            ),
                 
             Node(
-                package='pointcloud_to_laserscan', executable='pointcloud_to_laserscan_node',
-                remappings=[('cloud_in', '/livox/lidar'),
-                            ],
+                package='pointcloud_to_laserscan', 
+                executable='pointcloud_to_laserscan_node',
+                name='pointcloud_to_laserscan',
+                remappings=[
+                    ('cloud_in', '/livox/lidar'),
+                ],
                 parameters=[{
                     'target_frame': 'livox_frame',
                     'transform_tolerance': 0.01,
@@ -101,7 +78,6 @@ def generate_launch_description():
                     'use_inf': True,
                     'inf_epsilon': 1.0
                 }],
-                name='pointcloud_to_laserscan'
             ),
             Node(
                 package = 'diablo_convert',
@@ -111,11 +87,6 @@ def generate_launch_description():
             Node(
                 package = 'diablo_odom',
                 executable = 'odom_publish_node',
-                output = 'screen'
-            ),
-            Node(
-                package = 'diablo_teleop',
-                executable = 'teleop_stand_node',
                 output = 'screen'
             ),
         ]
