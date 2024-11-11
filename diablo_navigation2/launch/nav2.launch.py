@@ -1,5 +1,5 @@
 import os
-
+from pathlib import Path
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
@@ -11,20 +11,26 @@ from launch_ros.actions import Node
 def generate_launch_description():
     
     nav2_dir = os.path.join(get_package_share_directory('diablo_navigation2'))
+    map_share_dir = os.path.join(get_package_share_directory('diablo_navigation2'), 'maps')
+    path = Path(map_share_dir)
+    map_src_dir =  Path(path.parents[4], "src/diablo_ros2", *path.parts[-2:])
     nav2_launch_file_dir = os.path.join(get_package_share_directory('nav2_bringup'),'launch')
     rviz_config_dir = os.path.join(get_package_share_directory('nav2_bringup'),'rviz','nav2_default_view.rviz')
 
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
+    use_map = LaunchConfiguration('use_map', default='tianbotoffice_602')
+
+    # https://answers.ros.org/question/358655/ros2-concatenate-string-to-launchargument/
     map_dir = LaunchConfiguration(
         'map',
-        default = [nav2_dir,
-            '/maps',
-            '/tianbotoffice_602.yaml']
-        
+        default = [map_src_dir,
+            '/',
+            use_map,
+            '.yaml']
     )
     param_dir = LaunchConfiguration(
         'params_file',
-        default = [nav2_dir,'/config','/diablo_nav2.yaml']
+        default = [nav2_dir,'/params','/diablo_nav2.yaml']
     )
 
     return LaunchDescription(
