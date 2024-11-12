@@ -1,0 +1,4 @@
+[submodule "diablo_basic"]
+	path = diablo_basic
+	url = https://github.com/DDTRobot/diablo_ros2.git
+	branch = basic
